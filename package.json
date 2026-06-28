@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest"
+    "test": "npx ts-node --transpile-only src/tests/Repositorio.test.ts"
   },
   "devDependencies": {
     "typescript": "^6.0.3",
