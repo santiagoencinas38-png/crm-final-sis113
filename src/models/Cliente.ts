@@ -1,4 +1,4 @@
-import { Persona } from './Persona.js';
+import { Persona } from './Persona';
 
 export enum TipoCliente {
   REGULAR = 'Regular',
