@@ -1,4 +1,4 @@
-// Enum real para estados de cita 
+// Estados que puede tener una cita, para evitar strings sueltos por ahí
 export enum EstadoCita {
   PENDIENTE = 'pendiente',
   CONFIRMADA = 'confirmada',
@@ -23,6 +23,7 @@ export class Cita {
     fecha: Date,
     notas: string = ''
   ) {
+    // Validación básica para no tener datos inconsistentes
     if (!clienteId) throw new Error('El clienteId no puede estar vacío');
     if (!empleadoId) throw new Error('El empleadoId no puede estar vacío');
     if (!servicioId) throw new Error('El servicioId no puede estar vacío');
@@ -32,7 +33,7 @@ export class Cita {
     this.empleadoId = empleadoId;
     this.servicioId = servicioId;
     this.fecha = fecha;
-    this.estado = EstadoCita.PENDIENTE;
+    this.estado = EstadoCita.PENDIENTE; // Por defecto toda cita nace pendiente
     this.notas = notas;
   }
 
@@ -45,16 +46,19 @@ export class Cita {
   getNotas(): string { return this.notas; }
 
   confirmar(): void {
+    // Regla de negocio: no se puede revivir una cita cancelada
     if (this.estado === EstadoCita.CANCELADA) throw new Error('No se puede confirmar una cita cancelada');
     this.estado = EstadoCita.CONFIRMADA;
   }
 
   cancelar(): void {
+    // Si ya se completó el servicio, no tiene sentido cancelarla
     if (this.estado === EstadoCita.COMPLETADA) throw new Error('No se puede cancelar una cita completada');
     this.estado = EstadoCita.CANCELADA;
   }
 
   completar(): void {
+    // Solo permitimos completar si previamente fue confirmada
     if (this.estado !== EstadoCita.CONFIRMADA) throw new Error('Solo se pueden completar citas confirmadas');
     this.estado = EstadoCita.COMPLETADA;
   }
@@ -64,6 +68,7 @@ export class Cita {
   }
 
   toJSON(): object {
+    // Preparamos el objeto para el almacenamiento en localStorage
     return {
       id: this.id,
       clienteId: this.clienteId,
