@@ -1,4 +1,4 @@
-// Clase base abstracta - demuestra abstraccion y herencia
+// Clase base abstracta - no se puede instanciar directamente, solo sirve de molde
 export abstract class Persona {
   protected readonly id: string;
   protected nombre: string;
@@ -11,45 +11,54 @@ export abstract class Persona {
     telefono: string,
     email: string
   ) {
+    // Evitamos que alguien haga un "new Persona()" por error
     if (new.target === Persona) throw new Error('Persona es una clase abstracta');
+    
+    // Validaciones básicas antes de asignar
     if (!id.trim()) throw new Error('El ID no puede estar vacío');
+    
     this.id = id;
     this.nombre = nombre;
     this.telefono = telefono;
     this.email = email;
   }
 
+  // Getters para acceder a los datos protegidos
   getId(): string { return this.id; }
   getNombre(): string { return this.nombre; }
   getTelefono(): string { return this.telefono; }
   getEmail(): string { return this.email; }
 
+  // Setters con validación de integridad
   setNombre(nombre: string): void {
     if (!nombre.trim()) throw new Error('El nombre no puede estar vacío');
     this.nombre = nombre;
   }
+  
   setTelefono(tel: string): void {
     if (!tel.trim()) throw new Error('El teléfono no puede estar vacío');
     this.telefono = tel;
   }
+  
   setEmail(email: string): void { this.email = email; }
 
-  // Metodo abstracto - polimorfismo
+  // Métodos abstractos: obligan a las clases hijas a implementar su propia lógica
   abstract getRol(): string;
   abstract obtenerFichaTecnica(): string;
 
-  // Metodo estatico - demuestra miembros de clase
+  // Método de utilidad para ordenar listas de personas, funciona sin instanciar la clase
   static compararPorNombre(a: Persona, b: Persona): number {
     return a.getNombre().localeCompare(b.getNombre());
   }
 
+  // Serialización para guardar en el navegador
   toJSON(): object {
     return {
       id: this.id,
       nombre: this.nombre,
       telefono: this.telefono,
       email: this.email,
-      rol: this.getRol()
+      rol: this.getRol() // Incluimos el rol dinámico
     };
   }
 }
