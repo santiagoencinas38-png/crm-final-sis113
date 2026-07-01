@@ -1,9 +1,10 @@
-// Clase generica - elemento de competencia 3
+// Interface necesaria para asegurar que cualquier T que use el repositorio tenga los métodos básicos
 export interface IEntidad {
   getId(): string;
   toJSON(): object;
 }
 
+// Clase genérica: trabaja con cualquier entidad que implemente IEntidad
 export class Repositorio<T extends IEntidad> {
   private items: Map<string, T> = new Map();
   private nombreEntidad: string;
@@ -12,14 +13,16 @@ export class Repositorio<T extends IEntidad> {
     this.nombreEntidad = nombreEntidad;
   }
 
+  // CRUD: Crear
   agregar(item: T): void {
     if (this.items.has(item.getId())) {
       throw new Error(`${this.nombreEntidad} con ID ${item.getId()} ya existe`);
     }
     this.items.set(item.getId(), item);
-    this.guardarEnStorage();
+    this.guardarEnStorage(); // Persistimos en cada cambio
   }
 
+  // CRUD: Leer
   obtener(id: string): T {
     const item = this.items.get(id);
     if (!item) throw new Error(`${this.nombreEntidad} con ID ${id} no encontrado`);
@@ -30,6 +33,7 @@ export class Repositorio<T extends IEntidad> {
     return Array.from(this.items.values());
   }
 
+  // CRUD: Actualizar
   actualizar(item: T): void {
     if (!this.items.has(item.getId())) {
       throw new Error(`${this.nombreEntidad} con ID ${item.getId()} no existe`);
@@ -38,6 +42,7 @@ export class Repositorio<T extends IEntidad> {
     this.guardarEnStorage();
   }
 
+  // CRUD: Eliminar
   eliminar(id: string): void {
     if (!this.items.delete(id)) {
       throw new Error(`${this.nombreEntidad} con ID ${id} no encontrado`);
@@ -45,6 +50,7 @@ export class Repositorio<T extends IEntidad> {
     this.guardarEnStorage();
   }
 
+  // Persistencia: Serializamos la colección a JSON para guardarla en el navegador
   private guardarEnStorage(): void {
     try {
       const datos = Array.from(this.items.values()).map(i => i.toJSON());
@@ -54,6 +60,7 @@ export class Repositorio<T extends IEntidad> {
     }
   }
 
+  // Recuperación: Volvemos a convertir el JSON a instancias de clase
   cargarDesdeStorage(reconstruct: (data: any) => T): void {
     try {
       const raw = localStorage.getItem(`crm_${this.nombreEntidad}`);
